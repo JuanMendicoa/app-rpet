@@ -1,37 +1,47 @@
 <html>
   <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script type="text/javascript">
       google.charts.load('current', {'packages':['gauge']});
       google.charts.setOnLoadCallback(drawChart);
 
-      var chart, data, options;
-
       function drawChart() {
-        data = google.visualization.arrayToDataTable([
+        // Los datos incluyen valores decimales
+        var data = google.visualization.arrayToDataTable([
           ['Label', 'Value'],
-          ['Nivel (bar)', 0],
-          ['Nivel (m)', 0],
-          ['Presión Daf (bar)', 0]
+          ['Nivel (bar)', 0],   // Inicializar con 0
+          ['Nivel (m)', 0],     // Inicializar con 0
+          ['Presion (bar)', 0]  // Inicializar con 0
         ]);
 
-        options = {
+        var options = {
           width: 400, height: 120,
           redFrom: 90, redTo: 100,
-          yellowFrom: 75, yellowTo: 90,
-          minorTicks: 5
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 5,
+          max: 10  // Define el valor máximo para los indicadores
         };
 
-        chart = new google.visualization.Gauge(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
+        var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
 
-      // Función para actualizar los valores con los datos que provienen de App Inventor
-      function updateChart(nivelBar, nivelM, presionDaf) {
-        data.setValue(0, 1, nivelBar); // Actualiza Nivel (bar)
-        data.setValue(1, 1, nivelM);   // Actualiza Nivel (m)
-        data.setValue(2, 1, presionDaf); // Actualiza Presión Daf (bar)
         chart.draw(data, options);
+
+        // Esta función permite actualizar los valores de los indicadores.
+        function updateValues(nivelBar, nivelM, presionBar) {
+          data.setValue(0, 1, parseFloat(nivelBar));  // Asignar el valor decimal a Nivel (bar)
+          data.setValue(1, 1, parseFloat(nivelM));    // Asignar el valor decimal a Nivel (m)
+          data.setValue(2, 1, parseFloat(presionBar)); // Asignar el valor decimal a Presion (bar)
+          chart.draw(data, options);
+        }
+
+        // Obtener los valores desde la URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var nivelBar = urlParams.get('nivelBar') || 0;
+        var nivelM = urlParams.get('nivelM') || 0;
+        var presionBar = urlParams.get('presionBar') || 0;
+
+        // Actualizar los indicadores con los valores recibidos
+        updateValues(nivelBar, nivelM, presionBar);
       }
     </script>
   </head>
@@ -39,4 +49,3 @@
     <div id="chart_div" style="width: 400px; height: 120px;"></div>
   </body>
 </html>
-
